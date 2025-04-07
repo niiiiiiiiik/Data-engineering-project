@@ -1,0 +1,50 @@
+create DATABASE SCOPED CREDENTIAL cred_nik
+WITH
+    IDENTITY= 'Managed Identity'
+
+CREATE EXTERNAL DATA SOURCE source_silver
+WITH 
+(
+    LOCATION = 'https://awstoragedatalakenikhil.dfs.core.windows.net/silver',
+    CREDENTIAL= cred_nik
+)   
+
+CREATE EXTERNAL DATA SOURCE source_gold
+WITH 
+(
+    LOCATION = 'https://awstoragedatalakenikhil.dfs.core.windows.net/gold',
+    CREDENTIAL= cred_nik
+) 
+
+CREATE EXTERNAL file FORMAT format_parquet
+with
+(
+    FORMAT_TYPE= PARQUET,
+    DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec'
+)
+
+
+
+
+
+--------------------------------------------------
+------- create external table external sales 
+-------------------------------------------------------
+
+CREATE EXTERNAL TABLE gold.extsales
+WITH
+(
+    LOCATION = 'extsales',
+    DATA_SOURCE = source_gold,
+    FILE_FORMAT = format_parquet
+) as 
+SELECT * from gold.sales
+
+
+
+
+
+select * from gold.extsales
+
+
+
